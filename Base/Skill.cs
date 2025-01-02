@@ -4,19 +4,20 @@ class Skill
     public SkillType Type { get; set; }
     public int CoolTime { get; set; } // amount of turns required to reuse skill
     public int Count { get; set; } // amount of turns left to use skill
-    public Skill(string name, int coolTime)
+    public Skill(string name, int coolTime, SkillType skillType)
     {
         Name = name;
         CoolTime = coolTime;
         Count = 0;
+        Type = skillType;
     }
     
 }
 public enum SkillType
 {
-    Skill1,
-    Skill2,
-    Skill3,
-    Skill4,
-    Skill5,
+    BreakObstacle,
+    Paralyze,
+    SpeedUpgrade,
+    SpeedDowngrade,
+    Teleport,
 }

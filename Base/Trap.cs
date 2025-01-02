@@ -1,15 +1,17 @@
 class Trap
 {
     public TrapType Type { get; set; }
+    public bool Active { get; set; } 
     public Trap(TrapType type)
     {
         Type = type;
+        Active = true;
     }
 
 }
 public enum TrapType
 {
-    Type1,
-    Type2,
-    Type3,
+    Freeze,
+    SpeedDowngrade,
+    Teleport,
 }
