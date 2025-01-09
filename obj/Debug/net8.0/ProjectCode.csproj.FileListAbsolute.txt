@@ -35,3 +35,4 @@ C:\Users\Admin\Desktop\Project\ProProject\ProjectCode\obj\Debug\net8.0\ProjectCo
 C:\Users\Admin\Desktop\Project\ProProject\ProjectCode\obj\Debug\net8.0\ref\ProjectCode.dll
 C:\Users\Admin\Desktop\Project\ProProject\ProjectCode\bin\Debug\net8.0\SixLabors.ImageSharp.dll
 C:\Users\Admin\Desktop\Project\ProProject\ProjectCode\bin\Debug\net8.0\Spectre.Console.ImageSharp.dll
+C:\Users\Admin\Desktop\Project\ProProject\ProjectCode\obj\Debug\net8.0\ProjectCode.sourcelink.json
