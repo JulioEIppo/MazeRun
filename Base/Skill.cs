@@ -10,8 +10,13 @@ abstract class Skill
         CoolTime = coolTime;
         Count = 0;
         IsActive = false;
+        
     }
 
+    public bool CanUseSkill()
+    {
+        return Count <= 0;
+    }
 }
 
 
@@ -56,7 +61,7 @@ class SkillBreakObstacle : Skill
     {
         int row = token.GetRow(index);
         int col = token.GetCol(index);
-        maze[row, col].Type = Type.Path;
+        maze[row, col] = new CellPath(row, col);
         Count = CoolTime;
     }
 }
@@ -68,13 +73,14 @@ class SkillTeleport : Skill
     }
     public void UseSkill(Token token, Cell[,] maze, int index)
     {
-        int row = token.GetRow(index) + token.GetRow(token.GetRow(index));
-        int col = token.GetCol(index) + token.GetCol(token.GetCol(index));
-        if (maze[row, col].Type == Type.Path)
-        {
-            token.X += token.GetRow(token.GetRow(index));
-            token.Y += token.GetCol(token.GetCol(index));
-        }
+        // int row = token.GetRow(index) + token.GetRow(token.GetRow(index));
+        // int col = token.GetCol(index) + token.GetCol(token.GetCol(index));
+        // if (maze[row, col] is CellPath) 
+        // {
+        //     token.X += token.GetRow(token.GetRow(index));
+        //     token.Y += token.GetCol(token.GetCol(index));
+        // }
+        // fix this shit
     }
 }
 class SkillSight : Skill
@@ -83,8 +89,8 @@ class SkillSight : Skill
     {
 
     }
-    public void UseSkill(Token token, Cell[,] maze, Player player)
-    {
-        token.PrintTokenMaze(maze, token, token.Sight);
-    }
+    // public void UseSkill(Token token, Cell[,] maze)
+    // {
+    //     token.PrintTokenMaze(maze, token, token.Sight);
+    // }
 }

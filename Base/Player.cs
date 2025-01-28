@@ -2,11 +2,11 @@ using Spectre.Console;
 
 class Player
 {
-    public List<Token> Tokens { get; set; }
+    public Token Token { get; set; }
     public int Rounds { get; set; } //amount of rounds won
-    public Player(List<Token> tokens)
+    public Player(Token token)
     {
-        Tokens = tokens;
+        Token = token;
         Rounds = 0;
     }
     

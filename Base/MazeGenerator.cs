@@ -1,82 +1,58 @@
 using Spectre.Console;
 
-public enum Type
-{
-    Path,
-    Wall,
-    Obstacle,
-    Trap,
-}
 
-class Cell
-{
-    public int X { get; set; }
-    public int Y { get; set; }
-    public Type Type { get; set; }
-    public TrapType TrapType { get; set; }
-    public bool BeingUsed { get; set; }
-    public bool Exit { get; set; }
-    public Cell(int x, int y)
-    {
-        X = x;
-        Y = y;
-        Type = Type.Wall;
-        TrapType = new TrapNone();
-        BeingUsed = false;
-        Exit = false;
-    }
-    public void SetPath()
-    {
-        Type = Type.Path;
-    }
-    public void SetTrap(TrapType trapType)
-    {
-        Type = Type.Trap;
-        TrapType = trapType;
-    }
-}
 class MazeGenerator
 {
     public Random random = new Random();
-    public Cell[,] MazeGenerate(int height, int width, int numberOfTraps, List<Token> tokens)
+    public Cell[,] Generate(int height, int width, int numberOfTraps, List<Player> players)
     {
         Cell[,] maze = InitializeMaze(height, width);
         GeneratePaths(maze);
         SetTraps(maze, numberOfTraps);
-        SetExitAndSpawnTokens(maze, tokens);
+        SetExitAndSpawnTokens(maze, players);
         return maze;
     }
-    public Cell[,] InitializeMaze(int height, int width)
+    private Cell[,] InitializeMaze(int height, int width)
     {
         Cell[,] maze = new Cell[height, width];
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width; j++)
             {
-                maze[i, j] = new Cell(i, j);
+                maze[i, j] = new CellObstacle(i, j);
             }
         }
         return maze;
     }
     private void GeneratePaths(Cell[,] maze)
     {
-        HashSet<(int, int)> walls = new HashSet<(int, int)>(); //list to store walls
-        int startX = random.Next(0, maze.GetLength(0));
-        int startY = random.Next(0, maze.GetLength(1));
-        maze[startX, startY].SetPath();
-        walls.UnionWith(GetWalls(startX, startY, maze));
-        while (walls.Count > 0)
+        HashSet<(int, int)> obstacles = new HashSet<(int, int)>();
+        int startX = random.Next(1, maze.GetLength(0) - 1);
+        int startY = random.Next(1, maze.GetLength(1) - 1);
+        maze[startX, startY] = new CellPath(startX, startY);
+        obstacles.UnionWith(GetWalls(startX, startY, maze));
+        while (obstacles.Count > 0)
         {
-            (int, int) wall = walls.ElementAt(random.Next(walls.Count));
-            walls.Remove(wall);
-            int x = wall.Item1;
-            int y = wall.Item2;
+            (int, int) obstacle = obstacles.ElementAt(random.Next(obstacles.Count));
+            obstacles.Remove(obstacle);
+            int x = obstacle.Item1;
+            int y = obstacle.Item2;
             int adjacentPaths = CountAdjacentPaths(x, y, maze);
             if (adjacentPaths == 1)
             {
-                maze[x, y].SetPath();
-                walls.UnionWith(GetWalls(x, y, maze));
+                maze[x, y] = new CellPath(x, y);
+                obstacles.UnionWith(GetWalls(x, y, maze));
             }
+        }
+        for (int i = 0; i < maze.GetLength(0); i++)
+        {
+            maze[i, 0] = new CellWall(i, 0);
+            maze[i, maze.GetLength(1) - 1] = new CellWall(i, maze.GetLength(1) - 1);
+        }
+        for (int i = 0; i < maze.GetLength(1); i++)
+        {
+            maze[0, i] = new CellWall(0, i);
+            maze[maze.GetLength(0) - 1, i] = new CellWall(maze.GetLength(0) - 1, i);
         }
     }
 
@@ -87,7 +63,7 @@ class MazeGenerator
         {
             for (int j = 0; j < maze.GetLength(1); j++)
             {
-                if (maze[i, j].Type == Type.Path)
+                if (maze[i, j] is CellPath)
                 {
                     pathCells.Add((i, j));
                 }
@@ -97,19 +73,22 @@ class MazeGenerator
         {
             int index = random.Next(pathCells.Count);
             var (x, y) = pathCells[index];
-            maze[x, y].TrapType = GetRandomTrap();
+            maze[x, y] = GetRandomTrap(x, y);
         }
     }
-    private TrapType GetRandomTrap()
+    private CellTrap GetRandomTrap(int x, int y)
     {
         int randomIndex = random.Next(0, 3);
+        TrapType trap;
         switch (randomIndex)
         {
-            case 0: return new TrapParalyze();
-            case 1: return new TrapTeleport();
-            case 2: return new TrapSpeedDown();
-            default: return new TrapNone();
+            case 0: { trap = new TrapParalyze(); break; };
+            case 1: { trap = new TrapTeleport(); break; };
+            case 2: { trap = new TrapSpeedDown(); break; };
+            default: { trap = new TrapParalyze(); break; };
         }
+
+        return new CellTrap(x, y, trap);
     }
     private HashSet<(int, int)> GetWalls(int x, int y, Cell[,] maze) //Get adjacent walls
     {
@@ -135,63 +114,63 @@ class MazeGenerator
     private int CountAdjacentPaths(int x, int y, Cell[,] maze)
     {
         int count = 0;
-        if (x > 0 && maze[x - 1, y].Type == Type.Path)
+        if (x > 0 && maze[x - 1, y] is CellPath)
         {
             count++;
         }
-        if (x < maze.GetLength(0) - 1 && maze[x + 1, y].Type == Type.Path)
+        if (x < maze.GetLength(0) - 1 && maze[x + 1, y] is CellPath)
         {
             count++;
         }
-        if (y > 0 && maze[x, y - 1].Type == Type.Path)
+        if (y > 0 && maze[x, y - 1] is CellPath)
         {
             count++;
         }
-        if (y < maze.GetLength(1) - 1 && maze[x, y + 1].Type == Type.Path)
+        if (y < maze.GetLength(1) - 1 && maze[x, y + 1] is CellPath)
         {
             count++;
         }
         return count;
     }
-    public void SetExitAndSpawnTokens(Cell[,] maze, List<Token> tokens)
+    private void SetExitAndSpawnTokens(Cell[,] maze, List<Player> players)
     {
         int height = maze.GetLength(0);
         int width = maze.GetLength(1);
         int quarter = random.Next(0, 4);
         SetExit(maze, quarter, height, width);
-        SpawnTokens(maze, tokens, quarter, height, width);
+        SpawnTokens(maze, players, quarter, height, width);
     }
-    public void SetExit(Cell[,] maze, int quarter, int height, int width)
+    private void SetExit(Cell[,] maze, int quarter, int height, int width)
     {
         bool exitSet = false;
         while (!exitSet)
         {
             int x = random.Next(0, height);
             int y = random.Next(0, width);
-            if (maze[x, y].Type == Type.Path && IsInQuarter(x, y, maze, quarter, height, width))
+            if (maze[x, y] is CellPath && IsInQuarter(x, y, maze, quarter, height, width))
             {
-                maze[x, y].Exit = true;
+                maze[x, y] = new CellExit(x, y);
                 exitSet = true;
             }
         }
     }
-    public void SpawnTokens(Cell[,] maze, List<Token> tokens, int quarter, int height, int width)
+    private void SpawnTokens(Cell[,] maze, List<Player> players, int quarter, int height, int width)
     {
         int tokensSpawned = 0;
-        while (tokensSpawned != tokens.Count)
+        while (tokensSpawned != players.Count)
         {
             int x = random.Next(0, height);
             int y = random.Next(0, width);
-            
-            if (maze[x,y].Type == Type.Path && !IsInQuarter(x,y,maze,quarter,height,width) )
+
+            if (maze[x, y] is CellPath && !IsInQuarter(x, y, maze, quarter, height, width))
             {
-                tokens[tokensSpawned].X = x;
-                tokens[tokensSpawned].Y = y;
+                players[tokensSpawned].Token.X = x;
+                players[tokensSpawned].Token.Y = y;
                 tokensSpawned++;
             }
         }
     }
-    public bool IsInQuarter(int x, int y, Cell[,] maze, int quarter, int height, int width)
+    private bool IsInQuarter(int x, int y, Cell[,] maze, int quarter, int height, int width)
     {
         int startRow = (quarter / 2) * height / 2;
         int endRow = (quarter / 2) + height / 2;
@@ -200,20 +179,7 @@ class MazeGenerator
         return x >= startRow && x <= endRow && y >= startCol && y <= endCol;
     }
 
-    public static void PrintMaze(Cell[,] maze)
-    {
-        var wallColor = "[blue]■[/]";
-        var pathColor = "[black]■[/]";
-        var exitColor = "[yellow]■[/]";
-        for (int i = 0; i < maze.GetLength(0); i++)
-        {
-            for (int j = 0; j < maze.GetLength(1); j++)
-            {
-                AnsiConsole.Markup(maze[i, j].Type == Type.Wall ? wallColor : pathColor);
-            }
-            AnsiConsole.WriteLine();
-        }
-    }
+
 }
 
 
