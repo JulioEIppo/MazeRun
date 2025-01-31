@@ -51,7 +51,7 @@ class Program
     public static List<Player> GeneratePlayers()
     {
         List<Player> players = new List<Player>();
-        Console.WriteLine(" Ingrese la cantidad de jugadores");
+        Console.WriteLine("Ingrese la cantidad de jugadores");
         int playersAmount = Convert.ToInt32(Console.ReadLine());
         for (int i = 0; i < playersAmount; i++)
         {
@@ -59,7 +59,7 @@ class Program
             PrintTokens();
             string s = Console.ReadLine()!;
             int selected;
-            while (!int.TryParse(s, out selected) || selected == 0)
+            while (!int.TryParse(s, out selected) || selected > defaultTokens.Count || selected <= 0)
             {
                 Console.WriteLine("Numero invalido vuelva a intentarlo");
                 s = Console.ReadLine()!;

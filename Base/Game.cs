@@ -18,17 +18,6 @@ public class Game
         GameStop = false;
         SetExit();
     }
-
-    // public void InitializeRound(Cell[,] maze, List<Player> players)
-    // {
-
-    //     Players = players;
-    //     Maze = maze;
-    //     Turn = 0;
-    //     Round++;
-    // }
-
-    
     public void Move(Token token, int index)
     {
         if (ValidMove(index) && !GameStop)
@@ -46,7 +35,7 @@ public class Game
                     case 1:
                         ApplyTrapParalyze(token); break;
                     case 2:
-                        ApplyTrapTeleport(token); break;
+                        Teleport(token); break;
                 }
             }
             CheckExit();
@@ -99,14 +88,15 @@ public class Game
                         steps++;
                         break;
                     case "h":
-                        UseSkill(token);
                         Console.Clear();
+                        UseSkill(token);
                         break;
                     case "":
                         Console.Clear();
                         steps = token.Speed;
                         break;
                     default:
+                        Console.Clear();
                         Console.WriteLine("Direccion invalida, muevase con W, A, S, D");
                         break;
                 }
@@ -135,15 +125,17 @@ public class Game
     {
         if (!token.CanUseSkill())
         {
-            Console.WriteLine("No es posible usar la habilidad");
+            Console.WriteLine($"No es posible usar la habilidad. Faltan {token.Skill.Count} turnos");
             return;
         }
         switch (token.Skill.Name)
         {
             case "BreakObstacle":
+                PrintMaze();
                 Console.WriteLine("Selecciona la direccion en la que quieres romper la pared");
                 string direction = Console.ReadLine()!;
                 BreakObstacle(token, direction);
+                Console.Clear();
                 break;
             case "Paralyze":
                 Paralyze(token);
@@ -170,11 +162,13 @@ public class Game
         }
         (Players[Turn].Token.X, Players[player].Token.X) = (Players[player].Token.X, Players[Turn].Token.X);
         (Players[Turn].Token.Y, Players[player].Token.Y) = (Players[player].Token.Y, Players[Turn].Token.Y);
+        Console.WriteLine($"{Players[Turn].Token.Name} y {Players[player].Token.Name} han intercambiado posiciones");
     }
     public void SpeedUpgrade(Token token)
     {
         token.Speed += 1;
         token.SetSkillCount();
+
     }
     public Cell GetCell(Token token, int index)
     {
@@ -224,10 +218,11 @@ public class Game
         {
             row = random.Next(1, Maze.GetLength(0) - 1);
             col = random.Next(1, Maze.GetLength(1) - 1);
-            token.X = row;
-            token.Y = col;
         }
+        token.X = row;
+        token.Y = col;
         token.SetSkillCount();
+        Console.WriteLine($"{token.Name} se ha teletransportado");
     }
 
     public void ApplyTrapSpeedDown(Token token)
@@ -245,14 +240,19 @@ public class Game
     }
 
 
-    public void ApplyTrapTeleport(Token token)
-    {
-        int randomX = new Random().Next(1, Maze.GetLength(0) - 2);
-        int randomY = new Random().Next(1, Maze.GetLength(1) - 2);
-        token.X = randomX;
-        token.Y = randomY;
-        Console.WriteLine($"{token.Name} ha sido teletransportado");
-    }
+    // public void ApplyTrapTeleport(Token token)
+    // {
+    //     int randomX = new Random().Next(1, Maze.GetLength(0) - 2);
+    //     int randomY = new Random().Next(1, Maze.GetLength(1) - 2);
+    //     while (!(Maze[randomX, randomY] is CellPath))
+    //     {
+    //         randomX = new Random().Next(1, Maze.GetLength(0) - 2);
+    //         randomY = new Random().Next(1, Maze.GetLength(1) - 2);
+    //     }
+    //     token.X = randomX;
+    //     token.Y = randomY;
+    //     Console.WriteLine($"{token.Name} ha sido teletransportado");
+    // }
     public void CheckExit()
     {
 

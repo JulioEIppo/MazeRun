@@ -71,8 +71,12 @@ public class Token
             TrapTurns--;
             if (TrapTurns == 0)
             {
-                Speed = OriginalSpeed;
+                Speed++;
             }
+        }
+        if (TrapTurns == 0 &&Speed != OriginalSpeed)
+        {
+            Speed--;
         }
         Skill.Count--;
     }
