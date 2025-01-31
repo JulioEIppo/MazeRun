@@ -6,13 +6,15 @@ public enum State
     Normal,
     Paralyzed,
 }
-class Token
+public class Token
 {
     public string Name { get; set; }
     public int X { get; set; }
     public int Y { get; set; }
     public int Speed { get; set; }
+    public int OriginalSpeed { get; set; }
     public int Count { get; set; } // amount of turns left with abnormal state
+    public int TrapTurns { get; set; }
 
     public State State { get; set; }
     public int Sight { get; set; }
@@ -26,18 +28,13 @@ class Token
         Name = name;
         State = State.Normal;
         Speed = speed;
+        OriginalSpeed = Speed;
         Skill = skill;
         Count = 0;
+        TrapTurns = 0;
         Sight = 3;
         Icon = icon;
     }
-
-    // public void SetPosition(int x, int y)
-    // {
-    //     X = x;
-    //     Y = y;
-    // }
-
     public void MoveToken(int index)
     {
         if (State == State.Normal)
@@ -59,28 +56,6 @@ class Token
     {
         AnsiConsole.Markup(Icon);
     }
-    public void PrintTokenMaze(Cell[,] maze, int gridSize)
-    {
-        int aux = gridSize / 2;
-        int startX = Math.Max(0, X - aux);
-        int startY = Math.Max(0, Y - aux);
-        int endX = Math.Min(maze.GetLength(0) - 1, X + aux);
-        int endY = Math.Min(maze.GetLength(1) - 1, Y + aux);
-        for (int i = startX; i < endX; i++)
-        {
-            for (int j = startY; j < endY; j++)
-            {
-                if (i == X && j == Y)
-                {
-                    Print();
-                    continue;
-                }
-                maze[i, j].Print();
-            }
-        }
-
-    }
-
     public void Update()
     {
         if (State != State.Normal)
@@ -91,32 +66,24 @@ class Token
                 State = State.Normal;
             }
         }
+        if (TrapTurns != 0)
+        {
+            TrapTurns--;
+            if (TrapTurns == 0)
+            {
+                Speed = OriginalSpeed;
+            }
+        }
+        Skill.Count--;
     }
 
     public bool CanUseSkill()
     {
-        return this.Skill.CanUseSkill();
+        return Skill.CanUseSkill();
     }
-
-    public void ApplyTrap(TrapSpeedDown trap)
+    public void SetSkillCount()
     {
-        if (!trap.IsActive) return;
-        this.Speed -= 1;
+        Skill.Count = Skill.CoolTime;
     }
-
-    public void ApplyTrap(TrapParalyze trap)
-    {
-        if (!trap.IsActive) return;
-        this.State = State.Paralyzed;
-    }
-
-
-    public void ApplyTrap(TrapTeleport trap, int x, int y)
-    {
-        if (!trap.IsActive) return;
-        this.X = x;
-        this.Y = y;
-    }
-
 }
 

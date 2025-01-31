@@ -73,23 +73,23 @@ class MazeGenerator
         {
             int index = random.Next(pathCells.Count);
             var (x, y) = pathCells[index];
-            maze[x, y] = GetRandomTrap(x, y);
+            maze[x, y] = new CellTrap(x,y);
         }
     }
-    private CellTrap GetRandomTrap(int x, int y)
-    {
-        int randomIndex = random.Next(0, 3);
-        TrapType trap;
-        switch (randomIndex)
-        {
-            case 0: { trap = new TrapParalyze(); break; };
-            case 1: { trap = new TrapTeleport(); break; };
-            case 2: { trap = new TrapSpeedDown(); break; };
-            default: { trap = new TrapParalyze(); break; };
-        }
+    // private CellTrap GetRandomTrap(int x, int y)
+    // {
+    //     int randomIndex = random.Next(0, 3);
+    //     TrapType trap;
+    //     switch (randomIndex)
+    //     {
+    //         case 0: { trap = new TrapParalyze(); break; };
+    //         case 1: { trap = new TrapTeleport(); break; };
+    //         case 2: { trap = new TrapSpeedDown(); break; };
+    //         default: { trap = new TrapParalyze(); break; };
+    //     }
 
-        return new CellTrap(x, y, trap);
-    }
+    //     return new CellTrap(x, y, trap);
+    // }
     private HashSet<(int, int)> GetWalls(int x, int y, Cell[,] maze) //Get adjacent walls
     {
         HashSet<(int, int)> walls = new HashSet<(int, int)>();

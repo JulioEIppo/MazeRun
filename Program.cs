@@ -2,27 +2,48 @@
 
 class Program
 {
-    public static void Main(string[] args)
+    public static void Main()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
-        List<Player> players = GeneratePlayers();
-        Cell[,] maze = GenerateMaze(players);
-        Game game = new Game(maze, players);
-        // game.InitializeRound(maze, players);
-        game.Play();
-        // game.Stop();
-        // game.PrintMaze();
+        Console.Clear();
+        while (true)
+        {
+            GameMenu();
+            return;
+        }
+    }
+    public static void GameMenu()
+    {
+        Console.WriteLine("Bienvenido a Maze Run");
+        Console.WriteLine("Selecciona una opcion");
+        Console.WriteLine("1- Iniciar Juego");
+        Console.WriteLine("2- Salir");
+        string option = Console.ReadLine()!;
+        switch (option)
+        {
+            case "1":
+                List<Player> players = GeneratePlayers();
+                Cell[,] maze = GenerateMaze(players);
+                Game game = new Game(maze, players);
+                game.Play(); break;
+            case "2":
+                return;
+            default:
+                Console.WriteLine("Opcion invalida, intente de nuevo");
+                break;
+        }
     }
 
     static List<Token> defaultTokens = new List<Token>() {
-        new Token("Luffy", 5, new SkillBreakObstacle("Gomu Gomu", 3), "👒"),
-        new Token("Zoro", 4, new SkillSight("Eye Sight", 3), "🤖"),
-        new Token("Sanji", 4 , new SkillSight("Eye Sight", 3), "🦵"),
+        new Token("Luffy", 5, new Skill("SpeedUpgrade", 2), "👒"),
+        new Token("Optimus Prime", 4, new Skill("BreakObstacle", 2), "🤖"),
+        new Token("Harry Potter", 4 , new Skill("Swap", 2), "⚡"),
+        new Token("T-Rex", 4, new Skill("Paralyze", 2), "🦖")
     };
     public static Cell[,] GenerateMaze(List<Player> players)
     {
         var generator = new MazeGenerator();
-        Cell[,] maze = generator.Generate(11, 11, 5, players);
+        Cell[,] maze = generator.Generate(15, 15, 15, players);
         return maze;
     }
 
@@ -38,7 +59,7 @@ class Program
             PrintTokens();
             string s = Console.ReadLine()!;
             int selected;
-            while (!int.TryParse(s, out selected))
+            while (!int.TryParse(s, out selected) || selected == 0)
             {
                 Console.WriteLine("Numero invalido vuelva a intentarlo");
                 s = Console.ReadLine()!;
@@ -47,6 +68,7 @@ class Program
             Player player = new Player(token);
             players.Add(player);
             defaultTokens.Remove(token);
+            Console.Clear();
         }
 
         return players;

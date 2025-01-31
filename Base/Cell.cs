@@ -2,13 +2,12 @@
 
 using Spectre.Console;
 
-abstract class Cell
+public abstract class Cell
 {
     public int X { get; set; }
     public int Y { get; set; }
     abstract public string Emoji { get; set; }
 
-    public bool BeingUsed { get; set; }
     public Cell(int x, int y)
     {
         X = x;
@@ -16,7 +15,7 @@ abstract class Cell
     }
 
     public abstract void Print();
-   
+
 }
 class CellPath : Cell
 {
@@ -24,7 +23,7 @@ class CellPath : Cell
     public CellPath(int x, int y) : base(x, y)
     {
         Emoji = "🔵"; // blue circle emoji
-        
+
     }
     public override void Print()
     {
@@ -37,11 +36,10 @@ class CellPath : Cell
 class CellTrap : Cell
 {
     public override string Emoji { get; set; }
-    public TrapType TrapType { get; set; }
-    public CellTrap(int x, int y, TrapType trapType) : base(x, y)
+    
+    public CellTrap(int x, int y) : base(x, y)
     {
         Emoji = "🔴"; // red circle
-        TrapType = trapType;
     }
     public override void Print()
     {

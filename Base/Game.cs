@@ -1,6 +1,6 @@
 using Spectre.Console;
 
-class Game
+public class Game
 {
     public int Turn { get; set; }
     public List<Player> Players { get; set; }
@@ -9,6 +9,7 @@ class Game
     public (int, int) Exit { get; set; }
 
     public bool GameStop { get; set; }
+    public Random random = new Random();
     public Game(Cell[,] maze, List<Player> players)
     {
         Maze = maze;
@@ -18,35 +19,55 @@ class Game
         SetExit();
     }
 
-    public void InitializeRound(Cell[,] maze, List<Player> players)
-    {
+    // public void InitializeRound(Cell[,] maze, List<Player> players)
+    // {
 
-        Players = players;
-        Maze = maze;
-        Turn = 0;
-        Round++;
-    }
+    //     Players = players;
+    //     Maze = maze;
+    //     Turn = 0;
+    //     Round++;
+    // }
 
-
+    
     public void Move(Token token, int index)
     {
         if (ValidMove(index) && !GameStop)
         {
             token.MoveToken(index);
+            if (Maze[token.X, token.Y] is CellTrap)
+            {
+                Maze[token.X, token.Y] = new CellPath(token.X, token.Y);
+                Console.WriteLine($"{token.Name} ha caido en una trampa");
+                int temp = random.Next(0, 3);
+                switch (temp)
+                {
+                    case 0:
+                        ApplyTrapSpeedDown(token); break;
+                    case 1:
+                        ApplyTrapParalyze(token); break;
+                    case 2:
+                        ApplyTrapTeleport(token); break;
+                }
+            }
             CheckExit();
         }
     }
 
     public void Play()
     {
+        Console.Clear();
         while (!GameStop)
         {
-            PrintMaze();
-            Console.WriteLine($"Turno del player {Turn}");
+            Console.WriteLine($"Turno de {Players[Turn].Token.Name}");
             Token token = Players[Turn].Token;
+            if (token.State == State.Paralyzed)
+            {
+                Console.WriteLine($"{token.Name} esta paralizado por {token.Count} turnos");
+            }
             int steps = 0;
             while (steps < token.Speed)
             {
+                PrintMaze();
                 if (GameStop)
                 {
                     break;
@@ -58,32 +79,32 @@ class Game
                 switch (direction)
                 {
                     case "w":
+                        Console.Clear();
                         Move(token, 0);
                         steps++;
-                        PrintMaze();
                         break;
                     case "s":
+                        Console.Clear();
                         Move(token, 1);
                         steps++;
-                        PrintMaze();
                         break;
                     case "d":
+                        Console.Clear();
                         Move(token, 2);
                         steps++;
-                        PrintMaze();
                         break;
                     case "a":
+                        Console.Clear();
                         Move(token, 3);
                         steps++;
-                        PrintMaze();
                         break;
                     case "h":
-                        // skill here 
-                        PrintMaze();
+                        UseSkill(token);
+                        Console.Clear();
                         break;
                     case "":
+                        Console.Clear();
                         steps = token.Speed;
-                        // ChangeTurn();
                         break;
                     default:
                         Console.WriteLine("Direccion invalida, muevase con W, A, S, D");
@@ -95,7 +116,7 @@ class Game
                 ChangeTurn();
             }
         }
-        Console.WriteLine($"Ha ganado el jugador {Turn}");
+        Console.WriteLine($"El ganador ha sido {Players[Turn].Token.Name}");
     }
     public void SetExit()
     {
@@ -110,29 +131,147 @@ class Game
             }
         }
     }
+    public void UseSkill(Token token)
+    {
+        if (!token.CanUseSkill())
+        {
+            Console.WriteLine("No es posible usar la habilidad");
+            return;
+        }
+        switch (token.Skill.Name)
+        {
+            case "BreakObstacle":
+                Console.WriteLine("Selecciona la direccion en la que quieres romper la pared");
+                string direction = Console.ReadLine()!;
+                BreakObstacle(token, direction);
+                break;
+            case "Paralyze":
+                Paralyze(token);
+                break;
+            case "Teleport":
+                Teleport(token);
+                break;
+            case "SpeedUpgrade":
+                SpeedUpgrade(token);
+                break;
+            case "Swap":
+                Swap(token);
+                break;
+            default:
+                Console.WriteLine("La habilidad ha fallado :("); break;
+        }
+    }
+    public void Swap(Token token)
+    {
+        int player = random.Next(0, Players.Count);
+        while (player == Turn)
+        {
+            player = random.Next(0, Players.Count);
+        }
+        (Players[Turn].Token.X, Players[player].Token.X) = (Players[player].Token.X, Players[Turn].Token.X);
+        (Players[Turn].Token.Y, Players[player].Token.Y) = (Players[player].Token.Y, Players[Turn].Token.Y);
+    }
+    public void SpeedUpgrade(Token token)
+    {
+        token.Speed += 1;
+        token.SetSkillCount();
+    }
+    public Cell GetCell(Token token, int index)
+    {
+        return Maze[token.GetRow(index), token.GetCol(index)];
+    }
+    public void BreakObstacle(Token token, string direction)
+    {
+        switch (direction)
+        {
+            case "w":
+                if (GetCell(token, 0) is CellObstacle)
+                {
+                    Maze[token.GetRow(0), token.GetCol(0)] = new CellPath(token.GetRow(0), token.GetCol(0));
+                    token.SetSkillCount();
+                }
+                break;
+            case "s":
+                if (GetCell(token, 1) is CellObstacle)
+                {
+                    Maze[token.GetRow(1), token.GetCol(1)] = new CellPath(token.GetRow(1), token.GetCol(1));
+                }
+                token.SetSkillCount();
+                break;
+            case "d":
+                if (GetCell(token, 2) is CellObstacle)
+                {
+                    Maze[token.GetRow(2), token.GetCol(2)] = new CellPath(token.GetRow(2), token.GetCol(2));
+                }
+                token.SetSkillCount();
+                break;
+            case "a":
+                if (GetCell(token, 3) is CellObstacle)
+                {
+                    Maze[token.GetRow(3), token.GetCol(3)] = new CellPath(token.GetRow(3), token.GetCol(3));
+                }
+                token.SetSkillCount();
+                break;
+            default:
+                Console.WriteLine("La habilidad ha fallado"); break;
+        }
+    }
+    public void Teleport(Token token)
+    {
+        int row = random.Next(1, Maze.GetLength(0) - 1);
+        int col = random.Next(1, Maze.GetLength(1) - 1);
+        while (!(Maze[row, col] is CellPath))
+        {
+            row = random.Next(1, Maze.GetLength(0) - 1);
+            col = random.Next(1, Maze.GetLength(1) - 1);
+            token.X = row;
+            token.Y = col;
+        }
+        token.SetSkillCount();
+    }
+
+    public void ApplyTrapSpeedDown(Token token)
+    {
+        token.Speed -= 1;
+        token.TrapTurns = 3;
+        Console.WriteLine($"La velocidad de {token.Name} ahora es {token.Speed}");
+    }
+
+    public void ApplyTrapParalyze(Token token)
+    {
+        token.State = State.Paralyzed;
+        token.Count = 2;
+        Console.WriteLine($"{token.Name} ahora esta paralizado por {token.Count} turnos");
+    }
+
+
+    public void ApplyTrapTeleport(Token token)
+    {
+        int randomX = new Random().Next(1, Maze.GetLength(0) - 2);
+        int randomY = new Random().Next(1, Maze.GetLength(1) - 2);
+        token.X = randomX;
+        token.Y = randomY;
+        Console.WriteLine($"{token.Name} ha sido teletransportado");
+    }
     public void CheckExit()
     {
 
         if (Players[Turn].Token.X == Exit.Item1 && Players[Turn].Token.Y == Exit.Item2)
         {
             GameStop = true;
-            // Players[Turn].Rounds++;
         }
 
     }
-    public void SkillParalyze(Token token)
+    public void Paralyze(Token token)
     {
-        int random = new Random().Next(1, 6);
-        for (int i = 0; i < Players.Count; i++)
+        int player = random.Next(0, Players.Count);
+        while (player == Turn)
         {
-            if (Players[i].Token == token)
-            {
-                continue;
-            }
-            Players[i].Token.State = State.Paralyzed;
+            player = random.Next(0, Players.Count);
         }
-        token.Skill.Count = token.Skill.CoolTime;
-
+        Players[player].Paralyze(2);
+        token.SetSkillCount();
+        Console.WriteLine($"{Players[player].Token.Name} esta paralizado");
     }
 
     public bool ValidMove(int index)
