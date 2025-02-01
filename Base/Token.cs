@@ -17,7 +17,6 @@ public class Token
     public int TrapTurns { get; set; }
 
     public State State { get; set; }
-    public int Sight { get; set; }
     public string Icon { get; set; }
     public Skill Skill { get; set; }
     //                                       N  S  E  W
@@ -32,7 +31,6 @@ public class Token
         Skill = skill;
         Count = 0;
         TrapTurns = 0;
-        Sight = 3;
         Icon = icon;
     }
     public void MoveToken(int index)

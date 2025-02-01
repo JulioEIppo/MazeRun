@@ -27,25 +27,19 @@ class CellPath : Cell
     }
     public override void Print()
     {
-        // // var wallColor = "[blue]■[/]";
-        // var pathColor = "[black]■[/]";
-        // // var exitColor = "[yellow]■[/]";
         AnsiConsole.Markup(Emoji);
     }
 }
 class CellTrap : Cell
 {
     public override string Emoji { get; set; }
-    
+
     public CellTrap(int x, int y) : base(x, y)
     {
         Emoji = "🔴"; // red circle
     }
     public override void Print()
     {
-        // // var wallColor = "[blue]■[/]";
-        // var pathColor = "[black]■[/]";
-        // // var exitColor = "[yellow]■[/]";
         AnsiConsole.Markup(Emoji);
     }
 }
@@ -58,9 +52,6 @@ class CellWall : Cell
     }
     public override void Print()
     {
-        // var wallColor = "[blue]■[/]";
-        // // var pathColor = "[black]■[/]";
-        // // var exitColor = "[yellow]■[/]";
         AnsiConsole.Markup(Emoji);
     }
 }
@@ -73,10 +64,6 @@ class CellObstacle : Cell
     }
     public override void Print()
     {
-        // var obsColor = "[red]■[/]";
-        //    var wallColor = "[blue]■[/]";
-        //      // var pathColor = "[black]■[/]";
-        //     // var exitColor = "[yellow]■[/]";
         AnsiConsole.Markup(Emoji);
     }
 }
@@ -89,9 +76,6 @@ class CellExit : Cell
     }
     public override void Print()
     {
-        // // var wallColor = "[blue]■[/]";
-        // // var pathColor = "[black]■[/]";
-        // var exitColor = "[yellow]■[/]";
         AnsiConsole.Markup(Emoji);
     }
 }

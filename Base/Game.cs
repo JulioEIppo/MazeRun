@@ -5,7 +5,6 @@ public class Game
     public int Turn { get; set; }
     public List<Player> Players { get; set; }
     public Cell[,] Maze { get; set; }
-    public int Round { get; set; }
     public (int, int) Exit { get; set; }
 
     public bool GameStop { get; set; }
@@ -14,7 +13,6 @@ public class Game
     {
         Maze = maze;
         Players = players;
-        Round = 0;
         GameStop = false;
         SetExit();
     }
@@ -62,7 +60,8 @@ public class Game
                     break;
                 }
                 Console.WriteLine($"Quedan {token.Speed - steps} pasos restantes");
-                Console.WriteLine("Muevase con W, A, S, D");
+                Console.WriteLine("Muevase con W, A, S, D.");
+                Console.WriteLine("Para usar la habilidad presione H");
                 Console.WriteLine("Presione enter para terminar el turno");
                 string direction = Console.ReadLine()!;
                 switch (direction)
@@ -238,21 +237,6 @@ public class Game
         token.Count = 2;
         Console.WriteLine($"{token.Name} ahora esta paralizado por {token.Count} turnos");
     }
-
-
-    // public void ApplyTrapTeleport(Token token)
-    // {
-    //     int randomX = new Random().Next(1, Maze.GetLength(0) - 2);
-    //     int randomY = new Random().Next(1, Maze.GetLength(1) - 2);
-    //     while (!(Maze[randomX, randomY] is CellPath))
-    //     {
-    //         randomX = new Random().Next(1, Maze.GetLength(0) - 2);
-    //         randomY = new Random().Next(1, Maze.GetLength(1) - 2);
-    //     }
-    //     token.X = randomX;
-    //     token.Y = randomY;
-    //     Console.WriteLine($"{token.Name} ha sido teletransportado");
-    // }
     public void CheckExit()
     {
 
