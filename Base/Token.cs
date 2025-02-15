@@ -87,5 +87,12 @@ public class Token
     {
         Skill.Count = Skill.CoolTime;
     }
+    public void Description()
+    {
+        Console.Clear();
+        Console.WriteLine($"{Name} {Icon}");
+        Console.WriteLine($"Velocidad: {Speed}");
+        Skill.PrintSkillDescription();
+    }
 }
 

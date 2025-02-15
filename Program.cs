@@ -14,10 +14,12 @@ class Program
     }
     public static void GameMenu()
     {
+        Console.Clear();
         Console.WriteLine("Bienvenido a Maze Run");
         Console.WriteLine("Selecciona una opcion");
         Console.WriteLine("1- Iniciar Juego");
-        Console.WriteLine("2- Salir");
+        Console.WriteLine("2- Guia");
+        Console.WriteLine("3- Salir");
         string option = Console.ReadLine()!;
         switch (option)
         {
@@ -27,6 +29,8 @@ class Program
                 Game game = new Game(maze, players);
                 game.Play(); break;
             case "2":
+                Guide(); break;
+            case "3":
                 return;
             default:
                 Console.WriteLine("Opcion invalida, intente de nuevo");
@@ -38,7 +42,9 @@ class Program
         new Token("Luffy", 5, new Skill("SpeedUpgrade", 2), "👒"),
         new Token("Optimus Prime", 4, new Skill("BreakObstacle", 2), "🤖"),
         new Token("Harry Potter", 4 , new Skill("Swap", 2), "⚡"),
-        new Token("T-Rex", 4, new Skill("Paralyze", 2), "🦖")
+        new Token("T-Rex", 4, new Skill("Paralyze", 2), "🦖"),
+        new Token("Dracula", 5, new Skill("Teleport", 2), "🦇"),
+        new Token("John Pork", 4, new Skill("Swap", 2), "🐷")
     };
     public static Cell[,] GenerateMaze(List<Player> players)
     {
@@ -70,7 +76,6 @@ class Program
             defaultTokens.Remove(token);
             Console.Clear();
         }
-
         return players;
     }
 
@@ -81,5 +86,31 @@ class Program
             Console.WriteLine(i + 1 + " - " + defaultTokens[i].Name);
         }
 
+    }
+    public static void Guide()
+    {
+        Console.Clear();
+        Console.WriteLine("Fichas disponibles:");
+        int count = 1;
+        for (int i = 0; i < defaultTokens.Count; i++)
+        {
+            Console.WriteLine($"{count} - {defaultTokens[i].Name}");
+            count++;
+        }
+        Console.WriteLine("Selecciona el numero de una ficha para ver su descripcion");
+        string option = Console.ReadLine()!;
+        int selected;
+        while (!int.TryParse(option, out selected) || selected > defaultTokens.Count || selected <= 0)
+        {
+            Console.WriteLine("Numero invalido. Intente de nuevo");
+            option = Console.ReadLine()!;
+        }
+        defaultTokens[selected - 1].Description();
+        Console.WriteLine("Presiona Enter para volver al menu de inicio");
+        string enter = Console.ReadLine()!;
+        if (enter == "")
+        {
+            GameMenu();
+        }
     }
 }

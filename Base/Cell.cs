@@ -36,7 +36,8 @@ class CellTrap : Cell
 
     public CellTrap(int x, int y) : base(x, y)
     {
-        Emoji = "🔴"; // red circle
+        // Emoji = "🔴"; // red circle
+        Emoji = "🔵";
     }
     public override void Print()
     {
