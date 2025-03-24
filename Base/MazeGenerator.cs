@@ -1,5 +1,3 @@
-using Spectre.Console;
-
 
 class MazeGenerator
 {

@@ -73,7 +73,7 @@ class CellExit : Cell
     public override string Emoji { get; set; }
     public CellExit(int x, int y) : base(x, y)
     {
-        Emoji = "🔚"; //finish flag
+        Emoji = "🌌"; //milky way
     }
     public override void Print()
     {

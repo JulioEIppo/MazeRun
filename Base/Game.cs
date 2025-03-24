@@ -63,34 +63,34 @@ public class Game
                 Console.WriteLine("Muevase con W, A, S, D.");
                 Console.WriteLine("Para usar la habilidad presione H");
                 Console.WriteLine("Presione enter para terminar el turno");
-                string direction = Console.ReadLine()!;
-                switch (direction)
+                var key = Console.ReadKey();
+                switch (key.Key)
                 {
-                    case "w":
+                    case ConsoleKey.W:
                         Console.Clear();
                         Move(token, 0);
                         steps++;
                         break;
-                    case "s":
+                    case ConsoleKey.S:
                         Console.Clear();
                         Move(token, 1);
                         steps++;
                         break;
-                    case "d":
+                    case ConsoleKey.D:
                         Console.Clear();
                         Move(token, 2);
                         steps++;
                         break;
-                    case "a":
+                    case ConsoleKey.A:
                         Console.Clear();
                         Move(token, 3);
                         steps++;
                         break;
-                    case "h":
+                    case ConsoleKey.H:
                         Console.Clear();
                         UseSkill(token);
                         break;
-                    case "":
+                    case ConsoleKey.Enter:
                         Console.Clear();
                         steps = token.Speed;
                         break;
@@ -105,7 +105,7 @@ public class Game
                 ChangeTurn();
             }
         }
-        Console.WriteLine($"El ganador ha sido {Players[Turn].Token.Name}");
+        Console.WriteLine($"El ganador ha sido {Players[Turn].Token.Name} {Players[Turn].Token.Icon}");
     }
     public void SetExit()
     {
@@ -132,7 +132,7 @@ public class Game
             case "BreakObstacle":
                 PrintMaze();
                 Console.WriteLine("Selecciona la direccion en la que quieres romper la pared");
-                string direction = Console.ReadLine()!;
+                var direction = Console.ReadKey();
                 BreakObstacle(token, direction);
                 Console.Clear();
                 break;
@@ -142,8 +142,8 @@ public class Game
             case "Teleport":
                 Teleport(token);
                 break;
-            case "SpeedUpgrade":
-                SpeedUpgrade(token);
+            case "ExtraStep":
+                ExtraStep(token);
                 break;
             case "Swap":
                 Swap(token);
@@ -161,9 +161,10 @@ public class Game
         }
         (Players[Turn].Token.X, Players[player].Token.X) = (Players[player].Token.X, Players[Turn].Token.X);
         (Players[Turn].Token.Y, Players[player].Token.Y) = (Players[player].Token.Y, Players[Turn].Token.Y);
+        token.SetSkillCount();
         Console.WriteLine($"{Players[Turn].Token.Name} y {Players[player].Token.Name} han intercambiado posiciones");
     }
-    public void SpeedUpgrade(Token token)
+    public void ExtraStep(Token token)
     {
         token.Speed += 1;
         token.SetSkillCount();
@@ -173,32 +174,32 @@ public class Game
     {
         return Maze[token.GetRow(index), token.GetCol(index)];
     }
-    public void BreakObstacle(Token token, string direction)
+    public void BreakObstacle(Token token, ConsoleKeyInfo direction)
     {
-        switch (direction)
+        switch (direction.Key)
         {
-            case "w":
+            case ConsoleKey.W:
                 if (GetCell(token, 0) is CellObstacle)
                 {
                     Maze[token.GetRow(0), token.GetCol(0)] = new CellPath(token.GetRow(0), token.GetCol(0));
                     token.SetSkillCount();
                 }
                 break;
-            case "s":
+            case ConsoleKey.S:
                 if (GetCell(token, 1) is CellObstacle)
                 {
                     Maze[token.GetRow(1), token.GetCol(1)] = new CellPath(token.GetRow(1), token.GetCol(1));
                 }
                 token.SetSkillCount();
                 break;
-            case "d":
+            case ConsoleKey.D:
                 if (GetCell(token, 2) is CellObstacle)
                 {
                     Maze[token.GetRow(2), token.GetCol(2)] = new CellPath(token.GetRow(2), token.GetCol(2));
                 }
                 token.SetSkillCount();
                 break;
-            case "a":
+            case ConsoleKey.A:
                 if (GetCell(token, 3) is CellObstacle)
                 {
                     Maze[token.GetRow(3), token.GetCol(3)] = new CellPath(token.GetRow(3), token.GetCol(3));

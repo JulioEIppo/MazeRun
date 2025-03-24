@@ -20,8 +20,8 @@ public class Skill
         Console.WriteLine("Efecto:");
         switch (Name)
         {
-            case "SpeedUpgrade":
-                Console.WriteLine("Aumenta la velocidad de la ficha en 1"); break;
+            case "ExtraStep":
+                Console.WriteLine("Permite a la ficha dar un paso extra en su turno"); break;
             case "BreakObstacle":
                 Console.WriteLine("Permite romper una pared adyacente a la ficha"); break;
             case "Swap":

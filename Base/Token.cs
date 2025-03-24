@@ -87,6 +87,10 @@ public class Token
     {
         Skill.Count = Skill.CoolTime;
     }
+    public override string ToString()
+    {
+        return Name;
+    }
     public void Description()
     {
         Console.Clear();
